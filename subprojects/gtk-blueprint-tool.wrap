@@ -1,0 +1,8 @@
+[wrap-git]
+directory = gtk-blueprint-tool
+url = https://gitlab.gnome.org/jwestman/gtk-blueprint-tool.git
+revision = main
+depth = 1
+
+[provide]
+program_names = gtk-blueprint-tool

@@ -1,0 +1,57 @@
+using Gtk 4.0;
+
+template BlWindow : Gtk.ApplicationWindow {
+  default-width: 600;
+  default-height: 300;
+
+  [titlebar]
+  Gtk.HeaderBar header_bar {
+    [end]
+    Gtk.MenuButton {
+      icon-name: "open-menu-symbolic";
+      menu-model: "primary_menu";
+    }
+  }
+
+  Gtk.Box {
+    orientation: vertical;
+    
+    Gtk.Box toolbar {
+      orientation: horizontal;
+    
+      Gtk.Button btn_bold {
+        label: _("Bold");
+      }
+      
+      Gtk.Button btn_italic {
+        label: _("Italic");
+      }
+      
+      Gtk.Button btn_underline {
+        label: _("Underline");
+      }
+    }
+    
+    Gtk.TextView textview {
+      vexpand: true;
+    }
+  }
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("Preferences");
+      action: "app.preferences";
+    }
+    item {
+      label: _("Keyboard Shortcuts");
+      action: "win.show-help-overlay";
+    }
+    item {
+      label: _("About Bluetype");
+      action: "app.about";
+    }
+  }
+}
+

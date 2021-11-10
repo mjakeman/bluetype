@@ -10,8 +10,17 @@ bluetype_deps = [
 
 gnome = import('gnome')
 
+blueprints = custom_target('blueprints',
+  input: files(
+    'bl-window.blp'
+  ),
+  output: '.',
+  command: [find_program('gtk-blueprint-tool'), 'batch-compile', '@OUTPUT@', '@INPUT@'],
+)
+
 bluetype_sources += gnome.compile_resources('bluetype-resources',
     'bluetype.gresource.xml',
+    dependencies: blueprints,
     c_name: 'bluetype'
 )
 
