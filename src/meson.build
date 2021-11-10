@@ -6,6 +6,7 @@ bluetype_sources = [
 
 bluetype_deps = [
     dependency('gtk4'),
+    dependency('libadwaita-1')
 ]
 
 gnome = import('gnome')

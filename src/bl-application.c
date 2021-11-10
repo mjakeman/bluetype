@@ -21,10 +21,10 @@
 
 struct _BlApplication
 {
-  GtkApplication parent_instance;
+  AdwApplication parent_instance;
 };
 
-G_DEFINE_TYPE (BlApplication, bl_application, GTK_TYPE_APPLICATION)
+G_DEFINE_TYPE (BlApplication, bl_application, ADW_TYPE_APPLICATION)
 
 BlApplication *
 bl_application_new (gchar *application_id,

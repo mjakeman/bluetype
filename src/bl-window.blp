@@ -1,4 +1,5 @@
 using Gtk 4.0;
+// using Adw 1;
 
 template BlWindow : Gtk.ApplicationWindow {
   default-width: 600;
@@ -17,18 +18,29 @@ template BlWindow : Gtk.ApplicationWindow {
     orientation: vertical;
     
     Gtk.Box toolbar {
+      style "toolbar";
       orientation: horizontal;
-    
-      Gtk.Button btn_bold {
-        label: _("Bold");
-      }
       
-      Gtk.Button btn_italic {
-        label: _("Italic");
-      }
+      Gtk.DropDown {}
       
-      Gtk.Button btn_underline {
-        label: _("Underline");
+      Gtk.Box {
+        style "linked";
+        orientation: horizontal;
+        
+        Gtk.Button btn_bold {
+          icon-name: "format-text-bold-symbolic";
+          tooltip-text: _("Bold");
+        }
+        
+        Gtk.Button btn_italic {
+          icon-name: "format-text-italic-symbolic";
+          tooltip-text: _("Italic");
+        }
+        
+        Gtk.Button btn_underline {
+          icon-name: "format-text-underline-symbolic";
+          tooltip-text: _("Underline");
+        } 
       }
     }
     
