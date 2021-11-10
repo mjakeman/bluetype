@@ -1,0 +1,7 @@
+data/com.mattjakeman.Bluetype.desktop.in
+data/com.mattjakeman.Bluetype.appdata.xml.in
+data/com.mattjakeman.Bluetype.gschema.xml
+src/bluetype-window.ui
+src/main.c
+src/bluetype-window.c
+
