@@ -2,6 +2,7 @@ bluetype_sources = [
     'main.c',
     'bl-window.c',
     'bl-application.c',
+    'bl-document-view.c'
 ]
 
 bluetype_deps = [

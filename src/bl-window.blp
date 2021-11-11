@@ -27,25 +27,28 @@ template BlWindow : Gtk.ApplicationWindow {
         style "linked";
         orientation: horizontal;
         
-        Gtk.Button btn_bold {
+        Gtk.ToggleButton btn_bold {
           icon-name: "format-text-bold-symbolic";
           tooltip-text: _("Bold");
         }
         
-        Gtk.Button btn_italic {
+        Gtk.ToggleButton btn_italic {
           icon-name: "format-text-italic-symbolic";
           tooltip-text: _("Italic");
         }
         
-        Gtk.Button btn_underline {
+        Gtk.ToggleButton btn_underline {
           icon-name: "format-text-underline-symbolic";
           tooltip-text: _("Underline");
         } 
       }
     }
     
-    Gtk.TextView textview {
-      vexpand: true;
+    Gtk.ScrolledWindow {
+      .BlDocumentView textview {
+        wrap-mode: word-char;
+        vexpand: true;
+      }
     }
   }
 }

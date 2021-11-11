@@ -3,5 +3,6 @@
   <gresource prefix="/com/mattjakeman/Bluetype">
     <file>bl-window.ui</file>
     <file>gtk/help-overlay.ui</file>
+    <file>style.css</file>
   </gresource>
 </gresources>

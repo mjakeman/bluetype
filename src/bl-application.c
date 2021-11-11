@@ -47,25 +47,33 @@ bl_application_finalize (GObject *object)
 static void
 bl_application_activate (GApplication *app)
 {
-  GtkWindow *window;
+    GtkWindow *window;
 
-  /* It's good practice to check your parameters at the beginning of the
-   * function. It helps catch errors early and in development instead of
-   * by your users.
-   */
-  g_assert (GTK_IS_APPLICATION (app));
+    /* It's good practice to check your parameters at the beginning of the
+    * function. It helps catch errors early and in development instead of
+    * by your users.
+    */
+    g_assert (GTK_IS_APPLICATION (app));
 
-  /* Get the current window or create one if necessary. */
-  window = gtk_application_get_active_window (GTK_APPLICATION (app));
-  if (window == NULL)
+    // Add CSS Stylesheet
+    GtkCssProvider *css_provider = gtk_css_provider_new ();
+    gtk_css_provider_load_from_resource (css_provider, "/com/mattjakeman/Bluetype/style.css");
+
+    GdkDisplay *display = gdk_display_get_default ();
+    gtk_style_context_add_provider_for_display (display, GTK_STYLE_PROVIDER (css_provider),
+                                                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+    /* Get the current window or create one if necessary. */
+    window = gtk_application_get_active_window (GTK_APPLICATION (app));
+    if (window == NULL)
     window = g_object_new (BL_TYPE_WINDOW,
                            "application", app,
                            "default-width", 600,
                            "default-height", 300,
                            NULL);
 
-  /* Ask the window manager/compositor to present the window. */
-  gtk_window_present (window);
+    /* Ask the window manager/compositor to present the window. */
+    gtk_window_present (window);
 }
 
 
@@ -110,14 +118,14 @@ bl_application_show_about (GSimpleAction *action,
 static void
 bl_application_init (BlApplication *self)
 {
-  GSimpleAction *quit_action = g_simple_action_new ("quit", NULL);
-  g_signal_connect_swapped (quit_action, "activate", G_CALLBACK (g_application_quit), self);
-  g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (quit_action));
+    GSimpleAction *quit_action = g_simple_action_new ("quit", NULL);
+    g_signal_connect_swapped (quit_action, "activate", G_CALLBACK (g_application_quit), self);
+    g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (quit_action));
 
-  GSimpleAction *about_action = g_simple_action_new ("about", NULL);
-  g_signal_connect (about_action, "activate", G_CALLBACK (bl_application_show_about), self);
-  g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (about_action));
+    GSimpleAction *about_action = g_simple_action_new ("about", NULL);
+    g_signal_connect (about_action, "activate", G_CALLBACK (bl_application_show_about), self);
+    g_action_map_add_action (G_ACTION_MAP (self), G_ACTION (about_action));
 
-  const char *accels[] = {"<primary>q", NULL};
-  gtk_application_set_accels_for_action (GTK_APPLICATION (self), "app.quit", accels);
+    const char *accels[] = {"<primary>q", NULL};
+    gtk_application_set_accels_for_action (GTK_APPLICATION (self), "app.quit", accels);
 }
