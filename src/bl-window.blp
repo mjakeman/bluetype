@@ -1,5 +1,5 @@
 using Gtk 4.0;
-// using Adw 1;
+using Adw 1;
 
 template BlWindow : Gtk.ApplicationWindow {
   default-width: 600;
@@ -7,6 +7,11 @@ template BlWindow : Gtk.ApplicationWindow {
 
   [titlebar]
   Gtk.HeaderBar header_bar {
+    Gtk.ToggleButton flap_toggle {
+      icon-name: "dock-left-symbolic";
+      // active: bind flap.reveal-flap sync-create;
+    }
+
     [end]
     Gtk.MenuButton {
       icon-name: "open-menu-symbolic";
@@ -14,40 +19,63 @@ template BlWindow : Gtk.ApplicationWindow {
     }
   }
 
-  Gtk.Box {
-    orientation: vertical;
+  Adw.Flap flap {
+    // todo: make bidirectional
+    reveal-flap: bind flap_toggle.active sync-create;
     
-    Gtk.Box toolbar {
-      style "toolbar";
-      orientation: horizontal;
+    [flap]
+    Gtk.Box {
+      orientation: vertical;
       
-      Gtk.DropDown {}
+      Gtk.Label {
+        label: "Project Tree";
+        width-chars: 15; // todo: temp
+      }
       
-      Gtk.Box {
-        style "linked";
-        orientation: horizontal;
-        
-        Gtk.ToggleButton btn_bold {
-          icon-name: "format-text-bold-symbolic";
-          tooltip-text: _("Bold");
-        }
-        
-        Gtk.ToggleButton btn_italic {
-          icon-name: "format-text-italic-symbolic";
-          tooltip-text: _("Italic");
-        }
-        
-        Gtk.ToggleButton btn_underline {
-          icon-name: "format-text-underline-symbolic";
-          tooltip-text: _("Underline");
-        } 
+      Gtk.ListView {
+        style "navigation-sidebar";
       }
     }
-    
-    Gtk.ScrolledWindow {
-      .BlDocumentView textview {
-        wrap-mode: word-char;
-        vexpand: true;
+
+    [separator]
+    Gtk.Separator {}
+
+    Gtk.Box {
+      orientation: vertical;
+      hexpand: true;
+
+      Gtk.Box toolbar {
+        style "toolbar";
+        orientation: horizontal;
+
+        Gtk.DropDown {}
+
+        Gtk.Box {
+          style "linked";
+          orientation: horizontal;
+
+          Gtk.ToggleButton btn_bold {
+            icon-name: "format-text-bold-symbolic";
+            tooltip-text: _("Bold");
+          }
+
+          Gtk.ToggleButton btn_italic {
+            icon-name: "format-text-italic-symbolic";
+            tooltip-text: _("Italic");
+          }
+
+          Gtk.ToggleButton btn_underline {
+            icon-name: "format-text-underline-symbolic";
+            tooltip-text: _("Underline");
+          }
+        }
+      }
+
+      Gtk.ScrolledWindow {
+        .BlDocumentView textview {
+          wrap-mode: word-char;
+          vexpand: true;
+        }
       }
     }
   }

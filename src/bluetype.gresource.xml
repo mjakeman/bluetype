@@ -4,5 +4,6 @@
     <file>bl-window.ui</file>
     <file>gtk/help-overlay.ui</file>
     <file>style.css</file>
+    <file>icons/dock-left-symbolic.svg</file>
   </gresource>
 </gresources>
