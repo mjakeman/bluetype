@@ -59,16 +59,28 @@ bl_document_view_set_property (GObject      *object,
 }
 
 static void
-action_bold (BlDocumentView *self,
-             const char     *action_name,
-             GVariant       *param)
+toggle_tag (BlDocumentView *self, const char *tag_name)
 {
     GtkTextIter start_iter, end_iter;
 
     GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
     gtk_text_buffer_get_selection_bounds (buffer, &start_iter, &end_iter);
 
-    gtk_text_buffer_apply_tag_by_name (buffer, "bold", &start_iter, &end_iter);
+    GtkTextTagTable *table = gtk_text_buffer_get_tag_table (buffer);
+    GtkTextTag *style_tag = gtk_text_tag_table_lookup (table, tag_name);
+
+    if (gtk_text_iter_has_tag (&start_iter, style_tag))
+        gtk_text_buffer_remove_tag (buffer, style_tag, &start_iter, &end_iter);
+    else
+        gtk_text_buffer_apply_tag (buffer, style_tag, &start_iter, &end_iter);
+}
+
+static void
+action_bold (BlDocumentView *self,
+             const char     *action_name,
+             GVariant       *param)
+{
+    toggle_tag (self, "bold");
 }
 
 static void
@@ -76,12 +88,7 @@ action_italic (BlDocumentView *self,
                const char     *action_name,
                GVariant       *param)
 {
-    GtkTextIter start_iter, end_iter;
-
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
-    gtk_text_buffer_get_selection_bounds (buffer, &start_iter, &end_iter);
-
-    gtk_text_buffer_apply_tag_by_name (buffer, "italic", &start_iter, &end_iter);
+    toggle_tag (self, "italic");
 }
 
 
@@ -90,12 +97,7 @@ action_underline (BlDocumentView *self,
                   const char     *action_name,
                   GVariant       *param)
 {
-    GtkTextIter start_iter, end_iter;
-
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
-    gtk_text_buffer_get_selection_bounds (buffer, &start_iter, &end_iter);
-
-    gtk_text_buffer_apply_tag_by_name (buffer, "underline", &start_iter, &end_iter);
+    toggle_tag (self, "underline");
 }
 
 static void
