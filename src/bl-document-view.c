@@ -2,12 +2,17 @@
 
 #include "bl-document-text.h"
 
+#include <pango/pango.h>
+
 struct _BlDocumentView
 {
     GtkWidget parent_instance;
 
     BlDocumentText *doc;
     GtkIMContext *im_context;
+
+    // TODO: Very temporary - replace with BlDocumentText
+    GtkEntryBuffer *buffer;
 };
 
 G_DEFINE_FINAL_TYPE (BlDocumentView, bl_document_view, GTK_TYPE_WIDGET)
@@ -80,6 +85,27 @@ bl_document_view_set_property (GObject      *object,
 }
 
 static void
+bl_document_view_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
+{
+    BlDocumentView *self = BL_DOCUMENT_VIEW (widget);
+
+    const char *text = gtk_entry_buffer_get_text (self->buffer);
+
+    g_print ("Buffer: %s\n", text);
+
+    GdkRGBA black;
+    gdk_rgba_parse (&black, "black");
+
+    PangoContext *context = gtk_widget_get_pango_context (widget);
+    PangoLayout *layout = pango_layout_new (context);
+    pango_layout_set_text (layout, text, gtk_entry_buffer_get_length (self->buffer));
+
+    gtk_snapshot_append_layout (snapshot, layout, &black);
+
+    g_object_unref (layout);
+}
+
+static void
 toggle_tag (BlDocumentView *self, const char *tag_name)
 {
     g_print ("Set %s\n", tag_name);
@@ -139,6 +165,8 @@ bl_document_view_class_init (BlDocumentViewClass *klass)
 
     GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
+    widget_class->snapshot = bl_document_view_snapshot;
+
     gtk_widget_class_install_action (widget_class, "docview.bold", NULL, action_bold);
     gtk_widget_class_install_action (widget_class, "docview.italic", NULL, action_italic);
     gtk_widget_class_install_action (widget_class, "docview.underline", NULL, action_underline);
@@ -158,6 +186,9 @@ bl_document_view_commit (GtkIMContext   *im_context,
                          BlDocumentView *self)
 {
     g_print ("Text Commit: %s\n", str);
+    uint end_position = gtk_entry_buffer_get_length (self->buffer);
+    gtk_entry_buffer_insert_text (self->buffer, end_position, str, -1);
+    gtk_widget_queue_draw (GTK_WIDGET (self));
 }
 
 static void
@@ -199,14 +230,27 @@ bl_document_view_delete_surrounding (GtkIMContext   *im_context,
 
 
 static void
+bl_document_view_pressed (GtkGestureClick *gesture,
+                          int              n_press,
+                          double           x,
+                          double           y,
+                          BlDocumentView  *self)
+{
+    gtk_widget_grab_focus (GTK_WIDGET (self));
+}
+
+
+static void
 bl_document_view_init (BlDocumentView *self)
 {
     self->doc = bl_document_text_new ();
+    self->buffer = gtk_entry_buffer_new (NULL, -1);
 
     // Widget Properties
     gtk_widget_set_focusable (GTK_WIDGET (self), TRUE);
     gtk_widget_set_can_focus (GTK_WIDGET (self), TRUE);
     gtk_widget_set_focus_on_click (GTK_WIDGET (self), TRUE);
+    gtk_widget_set_cursor_from_name (GTK_WIDGET (self), "text");
 
     // Setup Input Method
     self->im_context = gtk_im_multicontext_new ();
@@ -229,4 +273,9 @@ bl_document_view_init (BlDocumentView *self)
     GtkEventController *key_controller = gtk_event_controller_key_new ();
     gtk_event_controller_key_set_im_context (GTK_EVENT_CONTROLLER_KEY (key_controller), self->im_context);
     gtk_widget_add_controller (GTK_WIDGET (self), key_controller);
+
+    GtkGesture *click_gesture = gtk_gesture_click_new ();
+    g_signal_connect (click_gesture, "pressed", G_CALLBACK (bl_document_view_pressed), self);
+    gtk_widget_add_controller (GTK_WIDGET (self), GTK_EVENT_CONTROLLER (click_gesture));
+
 }
