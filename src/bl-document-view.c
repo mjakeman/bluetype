@@ -1,14 +1,19 @@
 #include "bl-document-view.h"
 
+#include "bl-document-text.h"
+
 struct _BlDocumentView
 {
-    GtkTextView parent_instance;
+    GtkWidget parent_instance;
+
+    BlDocumentText *doc;
 };
 
-G_DEFINE_FINAL_TYPE (BlDocumentView, bl_document_view, GTK_TYPE_TEXT_VIEW)
+G_DEFINE_FINAL_TYPE (BlDocumentView, bl_document_view, GTK_TYPE_WIDGET)
 
 enum {
     PROP_0,
+    PROP_DOCUMENT,
     N_PROPS
 };
 
@@ -37,10 +42,13 @@ bl_document_view_get_property (GObject    *object,
     BlDocumentView *self = BL_DOCUMENT_VIEW (object);
 
     switch (prop_id)
-      {
-      default:
+    {
+    case PROP_DOCUMENT:
+        g_value_set_object (value, self->doc);
+        break;
+    default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      }
+    }
 }
 
 static void
@@ -52,27 +60,25 @@ bl_document_view_set_property (GObject      *object,
     BlDocumentView *self = BL_DOCUMENT_VIEW (object);
 
     switch (prop_id)
-      {
-      default:
+    {
+    case PROP_DOCUMENT:
+        if (self->doc)
+            g_object_unref (self->doc);
+
+        self->doc = g_value_get_object (value);
+
+        if (self->doc == NULL)
+            self->doc = bl_document_text_new ();
+        break;
+    default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      }
+    }
 }
 
 static void
 toggle_tag (BlDocumentView *self, const char *tag_name)
 {
-    GtkTextIter start_iter, end_iter;
-
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
-    gtk_text_buffer_get_selection_bounds (buffer, &start_iter, &end_iter);
-
-    GtkTextTagTable *table = gtk_text_buffer_get_tag_table (buffer);
-    GtkTextTag *style_tag = gtk_text_tag_table_lookup (table, tag_name);
-
-    if (gtk_text_iter_has_tag (&start_iter, style_tag))
-        gtk_text_buffer_remove_tag (buffer, style_tag, &start_iter, &end_iter);
-    else
-        gtk_text_buffer_apply_tag (buffer, style_tag, &start_iter, &end_iter);
+    g_print ("Set %s\n", tag_name);
 }
 
 static void
@@ -105,12 +111,7 @@ action_clear (BlDocumentView *self,
               const char     *action_name,
               GVariant       *param)
 {
-    GtkTextIter start_iter, end_iter;
-
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
-    gtk_text_buffer_get_selection_bounds (buffer, &start_iter, &end_iter);
-
-    gtk_text_buffer_remove_all_tags (buffer, &start_iter, &end_iter);
+    g_print ("Clear\n");
 }
 
 
@@ -122,6 +123,15 @@ bl_document_view_class_init (BlDocumentViewClass *klass)
     object_class->finalize = bl_document_view_finalize;
     object_class->get_property = bl_document_view_get_property;
     object_class->set_property = bl_document_view_set_property;
+
+    properties [PROP_DOCUMENT]
+        = g_param_spec_object ("document",
+                               "Document",
+                               "Document",
+                               BL_TYPE_DOCUMENT_TEXT,
+                               G_PARAM_READWRITE);
+
+    g_object_class_install_properties (object_class, N_PROPS, properties);
 
     GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
@@ -139,29 +149,7 @@ bl_document_view_class_init (BlDocumentViewClass *klass)
 }
 
 static void
-cb_buffer_notify (BlDocumentView *self,
-                  GParamSpec     *pspec)
-{
-    GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
-
-    if (!GTK_IS_TEXT_BUFFER (buffer))
-        return;
-
-    gtk_text_buffer_create_tag (buffer, "bold",
-                                "weight", PANGO_WEIGHT_BOLD,
-                                NULL);
-
-    gtk_text_buffer_create_tag (buffer, "italic",
-                                "style", PANGO_STYLE_ITALIC,
-                                NULL);
-
-    gtk_text_buffer_create_tag (buffer, "underline",
-                                "underline", PANGO_UNDERLINE_SINGLE,
-                                NULL);
-}
-
-static void
 bl_document_view_init (BlDocumentView *self)
 {
-    g_signal_connect (self, "notify::buffer", G_CALLBACK (cb_buffer_notify), NULL);
+    self->doc = bl_document_text_new ();
 }
