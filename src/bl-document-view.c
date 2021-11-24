@@ -7,6 +7,7 @@ struct _BlDocumentView
     GtkWidget parent_instance;
 
     BlDocumentText *doc;
+    GtkIMContext *im_context;
 };
 
 G_DEFINE_FINAL_TYPE (BlDocumentView, bl_document_view, GTK_TYPE_WIDGET)
@@ -29,6 +30,9 @@ static void
 bl_document_view_finalize (GObject *object)
 {
     BlDocumentView *self = (BlDocumentView *)object;
+
+    g_object_unref (g_steal_pointer (&self->doc));
+    g_object_unref (g_steal_pointer (&self->im_context));
 
     G_OBJECT_CLASS (bl_document_view_parent_class)->finalize (object);
 }
@@ -149,7 +153,80 @@ bl_document_view_class_init (BlDocumentViewClass *klass)
 }
 
 static void
+bl_document_view_commit (GtkIMContext   *im_context,
+                         gchar          *str,
+                         BlDocumentView *self)
+{
+    g_print ("Text Commit: %s\n", str);
+}
+
+static void
+bl_document_view_preedit_start (GtkIMContext   *im_context,
+                                BlDocumentView *self)
+{
+    g_print ("Text Preedit Start\n");
+}
+
+static void
+bl_document_view_preedit_changed (GtkIMContext   *im_context,
+                                  BlDocumentView *self)
+{
+    g_print ("Text Preedit Changed\n");
+}
+
+static void
+bl_document_view_preedit_end (GtkIMContext   *im_context,
+                              BlDocumentView *self)
+{
+    g_print ("Text Preedit End\n");
+}
+
+static void
+bl_document_view_retrieve_surrounding (GtkIMContext   *im_context,
+                                       BlDocumentView *self)
+{
+    g_print ("Text Preedit Retrieve Surrounding\n");
+}
+
+static gboolean
+bl_document_view_delete_surrounding (GtkIMContext   *im_context,
+                                     gint            offset,
+                                     gint            n_chars,
+                                     BlDocumentView *self)
+{
+    g_print ("Text Preedit Delete Surrounding\n");
+}
+
+
+static void
 bl_document_view_init (BlDocumentView *self)
 {
     self->doc = bl_document_text_new ();
+
+    // Widget Properties
+    gtk_widget_set_focusable (GTK_WIDGET (self), TRUE);
+    gtk_widget_set_can_focus (GTK_WIDGET (self), TRUE);
+    gtk_widget_set_focus_on_click (GTK_WIDGET (self), TRUE);
+
+    // Setup Input Method
+    self->im_context = gtk_im_multicontext_new ();
+
+    g_signal_connect (self->im_context, "commit",
+                      G_CALLBACK (bl_document_view_commit), self);
+    g_signal_connect (self->im_context, "preedit-start",
+                      G_CALLBACK (bl_document_view_preedit_start), self);
+    g_signal_connect (self->im_context, "preedit-changed",
+                      G_CALLBACK (bl_document_view_preedit_changed), self);
+    g_signal_connect (self->im_context, "preedit-end",
+                      G_CALLBACK (bl_document_view_preedit_end), self);
+    g_signal_connect (self->im_context, "retrieve-surrounding",
+                      G_CALLBACK (bl_document_view_retrieve_surrounding), self);
+    g_signal_connect (self->im_context, "delete-surrounding",
+                      G_CALLBACK (bl_document_view_delete_surrounding), self);
+
+
+    // Setup Event Controllers
+    GtkEventController *key_controller = gtk_event_controller_key_new ();
+    gtk_event_controller_key_set_im_context (GTK_EVENT_CONTROLLER_KEY (key_controller), self->im_context);
+    gtk_widget_add_controller (GTK_WIDGET (self), key_controller);
 }
