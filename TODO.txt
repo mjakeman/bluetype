@@ -1,0 +1,39 @@
+Word Processor Architecture:
+ - Piece Table
+ - Nobody said the entire thing has to be flat
+ - Pieces can either be 'InlinePiece' or 'BlockPiece'
+   - BlockPiece contains other pieces 'nested within'
+   - InlinePiece cannot contain children, siblings only
+ - Traversal iterates over each piece in the document linked list
+   - Checks for presence of children, then goes to next sibling
+   - Recursive? Or depth-first-search technically
+ - Pieces index into a separate format piece table
+   - Layout and style information is stored here
+   - This allows us to select subsets of the piece table to view
+     and still have formatting propagate
+   - Still supports undo/redo
+ - Designed primarily for 'fragments'
+   - Can view sections in any order and have redo/undo work appropriately
+
+Block Pieces:
+ - List
+ - Table
+ - Equation
+
+Goals:
+ - Support most of what google docs does
+ - All pango attributes are usable
+ - I18n and bidirectional support (at a later date)
+ - Tables/Images/Lists/Equations
+ - Full Undo/Redo
+ - Fast, Lightweight, Native
+   -> Entirely in C (no webkit)
+ - Eventually split out into a reusable Rich Text widget
+ - Save to ODT (maybe also Markdown/HTML?)
+
+Non-Goals:
+ - Compete with Microsoft Word
+ - DOCX/OOXML
+ - Forms, Macros, Scripting
+ - Any sort of advanced layout
+   -> Use Publisher or Scribus instead
