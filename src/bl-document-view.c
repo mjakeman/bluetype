@@ -2,6 +2,8 @@
 
 #include "bl-document-text.h"
 
+#include "text/text-block.h"
+
 #include <pango/pango.h>
 
 struct _BlDocumentView
@@ -89,20 +91,41 @@ bl_document_view_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
 {
     BlDocumentView *self = BL_DOCUMENT_VIEW (widget);
 
-    const char *text = gtk_entry_buffer_get_text (self->buffer);
+    int width = gtk_widget_get_allocated_width (widget);
 
-    g_print ("Buffer: %s\n", text);
+    GList *list = bl_document_text_get_blocks (self->doc);
+    for (; list != NULL; list = list->next)
+    {
+        /*if (descent > height)
+            return;*/
 
-    GdkRGBA black;
-    gdk_rgba_parse (&black, "black");
+        char *text;
+        g_object_get (TEXT_BLOCK (list->data),
+                      "contents", &text,
+                      NULL);
 
-    PangoContext *context = gtk_widget_get_pango_context (widget);
-    PangoLayout *layout = pango_layout_new (context);
-    pango_layout_set_text (layout, text, gtk_entry_buffer_get_length (self->buffer));
+        g_print ("Buffer: %s\n", text);
 
-    gtk_snapshot_append_layout (snapshot, layout, &black);
+        GdkRGBA black;
+        gdk_rgba_parse (&black, "black");
 
-    g_object_unref (layout);
+        PangoContext *context = gtk_widget_get_pango_context (widget);
+        PangoLayout *layout = pango_layout_new (context);
+        pango_layout_set_text (layout, text, -1);
+        pango_layout_set_width (layout, width * PANGO_SCALE);
+        pango_layout_set_wrap (layout, PANGO_WRAP_WORD_CHAR);
+
+        int descent;
+        pango_layout_get_pixel_size (layout, NULL, &descent);
+
+        gtk_snapshot_append_layout (snapshot, layout, &black);
+        gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (0, descent * 1.5f));
+
+        g_object_unref (layout);
+
+    }
+
+    // const char *text = gtk_entry_buffer_get_text (self->buffer);
 }
 
 static void
@@ -277,5 +300,4 @@ bl_document_view_init (BlDocumentView *self)
     GtkGesture *click_gesture = gtk_gesture_click_new ();
     g_signal_connect (click_gesture, "pressed", G_CALLBACK (bl_document_view_pressed), self);
     gtk_widget_add_controller (GTK_WIDGET (self), GTK_EVENT_CONTROLLER (click_gesture));
-
 }

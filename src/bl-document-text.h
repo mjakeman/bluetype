@@ -9,5 +9,6 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (BlDocumentText, bl_document_text, BL, DOCUMENT_TEXT, GObject)
 
 BlDocumentText *bl_document_text_new (void);
+GList *bl_document_text_get_blocks (BlDocumentText *self);
 
 G_END_DECLS

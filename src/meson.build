@@ -1,9 +1,11 @@
 bluetype_sources = [
-    'main.c',
     'bl-window.c',
     'bl-application.c',
     'bl-document-view.c',
-    'bl-document-text.c'
+    'bl-document-text.c',
+
+    # Text Sources
+    'text/text-block.c'
 ]
 
 bluetype_deps = [
@@ -21,13 +23,30 @@ blueprints = custom_target('blueprints',
   command: [find_program('gtk-blueprint-tool'), 'batch-compile', '@OUTPUT@', '@INPUT@'],
 )
 
-bluetype_sources += gnome.compile_resources('bluetype-resources',
+# Create a static library so we can test it
+libbluetype = static_library('bluetype',
+    bluetype_sources,
+    dependencies: bluetype_deps,
+    install: false,
+)
+
+bluetype_dep = declare_dependency(
+  link_with: libbluetype,
+  dependencies: bluetype_deps
+)
+
+# Compile resources into executable
+bluetype_resources = gnome.compile_resources('bluetype-resources',
     'bluetype.gresource.xml',
     dependencies: blueprints,
     c_name: 'bluetype'
 )
 
-executable('bluetype', bluetype_sources,
-    dependencies: bluetype_deps,
+executable('bluetype',
+    [
+        'main.c',
+        bluetype_resources,
+    ],
+    dependencies: bluetype_dep,
     install: true,
 )
