@@ -147,8 +147,14 @@ bl_document_view_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
 {
     BlDocumentView *self = BL_DOCUMENT_VIEW (widget);
 
+    int padding = 20;
+
     int width = gtk_widget_get_allocated_width (widget);
     PangoContext *context = gtk_widget_get_pango_context (widget);
+
+    // Apply padding
+    gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (padding, padding));
+    width -= 2*padding;
 
     GList *list = bl_document_text_get_blocks (self->doc);
     for (; list != NULL; list = list->next)
