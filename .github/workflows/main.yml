@@ -17,3 +17,4 @@ jobs:
         bundle: bluetype.flatpak
         manifest-path: com.mattjakeman.Bluetype.json
         cache-key: flatpak-builder-${{ github.sha }}
+        run-tests: true
