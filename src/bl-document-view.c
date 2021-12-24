@@ -1,7 +1,28 @@
+/* bl-document-view.c
+ *
+ * Copyright 2021 Matthew Jakeman <mjakeman26@outlook.co.nz>
+ *
+ * This file is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This file is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * SPDX-License-Identifier: LGPL-3.0-or-later
+ */
+
+#define G_LOG_DOMAIN "bluetype-document-view"
+
 #include "bl-document-view.h"
 
 #include "bl-document-text.h"
-
 #include "text/text.h"
 
 #include <pango/pango.h>
@@ -17,7 +38,8 @@ struct _BlDocumentView
     GtkEntryBuffer *buffer;
 };
 
-G_DEFINE_FINAL_TYPE (BlDocumentView, bl_document_view, GTK_TYPE_WIDGET)
+G_DEFINE_FINAL_TYPE_WITH_CODE (BlDocumentView, bl_document_view, GTK_TYPE_WIDGET,
+                               G_IMPLEMENT_INTERFACE (GTK_TYPE_SCROLLABLE, NULL))
 
 enum {
     PROP_0,
@@ -212,7 +234,6 @@ action_clear (BlDocumentView *self,
 {
     g_print ("Clear\n");
 }
-
 
 static void
 bl_document_view_class_init (BlDocumentViewClass *klass)

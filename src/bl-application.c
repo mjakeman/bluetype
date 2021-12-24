@@ -1,22 +1,27 @@
 /* bl-application.c
  *
- * Copyright 2021 Matthew Jakeman
+ * Copyright 2021 Matthew Jakeman <mjakeman26@outlook.co.nz>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This file is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * This file is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
+#define G_LOG_DOMAIN "bluetype-application"
+
 #include "bl-application.h"
+
 #include "bl-window.h"
 
 struct _BlApplication
@@ -68,8 +73,6 @@ bl_application_activate (GApplication *app)
     if (window == NULL)
     window = g_object_new (BL_TYPE_WINDOW,
                            "application", app,
-                           "default-width", 600,
-                           "default-height", 300,
                            NULL);
 
     /* Ask the window manager/compositor to present the window. */
