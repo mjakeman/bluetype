@@ -108,9 +108,14 @@ bl_application_show_about (GSimpleAction *action,
   window = gtk_application_get_active_window (GTK_APPLICATION (self));
 
   gtk_show_about_dialog (window,
-                         "program-name", "bluetype",
                          "authors", authors,
+                         "comments", "A fast and lightweight word processor.",
+                         "copyright", "Copyright © 2021 Matthew Jakeman",
+                         "license-type", GTK_LICENSE_LGPL_3_0,
+                         "logo-icon-name", "com.mattjakeman.Bluetype",
+                         "program-name", "bluetype",
                          "version", "0.1.0",
+                         "website", "https://github.com/mjakeman/bluetype-next",
                          NULL);
 }
 
