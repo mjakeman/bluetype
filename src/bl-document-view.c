@@ -171,7 +171,8 @@ text_block_snapshot (TextBlock    *block,
                      PangoContext *context,
                      int           width,
                      GtkSnapshot  *snapshot,
-                     const gchar  *decoration)
+                     const gchar  *decoration,
+                     GdkRGBA      *text_color)
 {
     char *text;
     g_object_get (block,
@@ -179,9 +180,6 @@ text_block_snapshot (TextBlock    *block,
                   NULL);
 
     g_print ("Buffer: %s\n", text);
-
-    GdkRGBA black;
-    gdk_rgba_parse (&black, "black");
 
     PangoLayout *layout = pango_layout_new (context);
     pango_layout_set_text (layout, text, -1);
@@ -201,7 +199,7 @@ text_block_snapshot (TextBlock    *block,
         PangoLayout *decoration_layout = pango_layout_new (context);
         pango_layout_set_text (decoration_layout, decoration, -1);
         pango_layout_set_height (decoration_layout, first_height);
-        gtk_snapshot_append_layout (snapshot, decoration_layout, &black);
+        gtk_snapshot_append_layout (snapshot, decoration_layout, text_color);
         gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (15, 0));
     }
 
@@ -212,7 +210,7 @@ text_block_snapshot (TextBlock    *block,
     int descent;
     pango_layout_get_pixel_size (layout, NULL, &descent);
 
-    gtk_snapshot_append_layout (snapshot, layout, &black);
+    gtk_snapshot_append_layout (snapshot, layout, text_color);
     gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (0, descent + spacing));
 
     g_object_unref (layout);
@@ -222,7 +220,8 @@ static void
 text_list_snapshot (TextList     *list,
                     PangoContext *context,
                     int           width,
-                    GtkSnapshot  *snapshot)
+                    GtkSnapshot  *snapshot,
+                    GdkRGBA      *text_color)
 {
     gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (40, 0));
 
@@ -231,7 +230,7 @@ text_list_snapshot (TextList     *list,
          node != NULL;
          node = text_node_get_next_sibling (node))
     {
-        text_block_snapshot (TEXT_BLOCK (node), context, width - 40, snapshot, "•");
+        text_block_snapshot (TEXT_BLOCK (node), context, width - 40, snapshot, "•", text_color);
     }
 
     gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (-40, 0));
@@ -255,6 +254,11 @@ bl_document_view_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
     gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (padding, padding + displacement));
     width -= 2*padding;
 
+    // Get colour information
+    GdkRGBA text_color;
+    GtkStyleContext *style = gtk_widget_get_style_context (widget);
+    gtk_style_context_get_color (style, &text_color);
+
     GList *list = bl_document_text_get_blocks (self->doc);
     for (; list != NULL; list = list->next)
     {
@@ -262,9 +266,9 @@ bl_document_view_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
             return;*/
 
         if (TEXT_IS_LIST (list->data))
-            text_list_snapshot (TEXT_LIST (list->data), context, width, snapshot);
+            text_list_snapshot (TEXT_LIST (list->data), context, width, snapshot, &text_color);
         else if (TEXT_IS_BLOCK (list->data))
-            text_block_snapshot (TEXT_BLOCK (list->data), context, width, snapshot, NULL);
+            text_block_snapshot (TEXT_BLOCK (list->data), context, width, snapshot, NULL, &text_color);
         else
             g_warning ("Skipping %s\n", g_type_name_from_instance ((GTypeInstance*)list->data));
 
