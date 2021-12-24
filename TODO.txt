@@ -1,13 +1,9 @@
 Word Processor Architecture:
- - Piece Table
- - Nobody said the entire thing has to be flat
- - Pieces can either be 'InlinePiece' or 'BlockPiece'
-   - BlockPiece contains other pieces 'nested within'
-   - InlinePiece cannot contain children, siblings only
- - Traversal iterates over each piece in the document linked list
+ - DOM tree structure
+ - Traversal iterates over each node in the document linked list
    - Checks for presence of children, then goes to next sibling
    - Recursive? Or depth-first-search technically
- - Pieces index into a separate format piece table
+ - Nodes index into a separate format piece table?
    - Layout and style information is stored here
    - This allows us to select subsets of the piece table to view
      and still have formatting propagate
@@ -15,7 +11,7 @@ Word Processor Architecture:
  - Designed primarily for 'fragments'
    - Can view sections in any order and have redo/undo work appropriately
 
-Block Pieces:
+Container Nodes:
  - List
  - Table
  - Equation
@@ -30,6 +26,8 @@ Goals:
    -> Entirely in C (no webkit)
  - Eventually split out into a reusable Rich Text widget
  - Save to ODT (maybe also Markdown/HTML?)
+ - MPL-2.0 licenced. Somewhat permissive, still copyleft.
+   -> Compatibility with LibreOffice source code
 
 Non-Goals:
  - Compete with Microsoft Word
