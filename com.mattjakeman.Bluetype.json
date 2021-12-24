@@ -24,13 +24,25 @@
     ],
     "modules": [
         {
-            "name": "bluetype",
+            "name": "blueprint-compiler",
             "builddir": true,
             "buildsystem": "meson",
             "sources": [
                 {
                     "type": "git",
-                    "path": "https://github.com/mjakeman/bluetype-next"
+                    "url": "https://gitlab.gnome.org/jwestman/blueprint-compiler.git",
+                    "branch": "main"
+                }
+            ]
+        },
+        {
+            "name": "bluetype",
+            "builddir": true,
+            "buildsystem": "meson",
+            "sources": [
+                {
+                    "type": "dir",
+                    "path": "./"
                 }
             ]
         }
