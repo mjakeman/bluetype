@@ -5,7 +5,9 @@ bluetype_sources = [
     'bl-document-text.c',
 
     # Text Sources
-    'text/text-block.c'
+    'text/text-node.c',
+    'text/text-block.c',
+    'text/text-list.c'
 ]
 
 bluetype_deps = [

@@ -2,7 +2,7 @@
 
 #include "bl-document-text.h"
 
-#include "text/text-block.h"
+#include "text/text.h"
 
 #include <pango/pango.h>
 
@@ -87,11 +87,68 @@ bl_document_view_set_property (GObject      *object,
 }
 
 static void
+text_block_snapshot (TextBlock    *block,
+                     PangoContext *context,
+                     int           width,
+                     GtkSnapshot  *snapshot)
+{
+    char *text;
+    g_object_get (block,
+                  "contents", &text,
+                  NULL);
+
+    g_print ("Buffer: %s\n", text);
+
+    GdkRGBA black;
+    gdk_rgba_parse (&black, "black");
+
+    PangoLayout *layout = pango_layout_new (context);
+    pango_layout_set_text (layout, text, -1);
+    pango_layout_set_width (layout, width * PANGO_SCALE);
+    pango_layout_set_wrap (layout, PANGO_WRAP_WORD_CHAR);
+
+    int index =  pango_layout_get_line_count (layout) - 1;
+    PangoLayoutLine* last_line = pango_layout_get_line (layout, index);
+
+    int height, spacing;
+    pango_layout_line_get_height (last_line, &height);
+    spacing = (height / PANGO_SCALE) * 0.5f;
+
+    int descent;
+    pango_layout_get_pixel_size (layout, NULL, &descent);
+
+    gtk_snapshot_append_layout (snapshot, layout, &black);
+    gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (0, descent + spacing));
+
+    g_object_unref (layout);
+}
+
+static void
+text_list_snapshot (TextList     *list,
+                    PangoContext *context,
+                    int           width,
+                    GtkSnapshot  *snapshot)
+{
+    gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (50, 0));
+
+    TextNode *node;
+    for (node = text_node_get_first_child (TEXT_NODE (list));
+         node != NULL;
+         node = text_node_get_next_sibling (node))
+    {
+        text_block_snapshot (TEXT_BLOCK (node), context, width - 50, snapshot);
+    }
+
+    gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (-50, 0));
+}
+
+static void
 bl_document_view_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
 {
     BlDocumentView *self = BL_DOCUMENT_VIEW (widget);
 
     int width = gtk_widget_get_allocated_width (widget);
+    PangoContext *context = gtk_widget_get_pango_context (widget);
 
     GList *list = bl_document_text_get_blocks (self->doc);
     for (; list != NULL; list = list->next)
@@ -99,29 +156,12 @@ bl_document_view_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
         /*if (descent > height)
             return;*/
 
-        char *text;
-        g_object_get (TEXT_BLOCK (list->data),
-                      "contents", &text,
-                      NULL);
-
-        g_print ("Buffer: %s\n", text);
-
-        GdkRGBA black;
-        gdk_rgba_parse (&black, "black");
-
-        PangoContext *context = gtk_widget_get_pango_context (widget);
-        PangoLayout *layout = pango_layout_new (context);
-        pango_layout_set_text (layout, text, -1);
-        pango_layout_set_width (layout, width * PANGO_SCALE);
-        pango_layout_set_wrap (layout, PANGO_WRAP_WORD_CHAR);
-
-        int descent;
-        pango_layout_get_pixel_size (layout, NULL, &descent);
-
-        gtk_snapshot_append_layout (snapshot, layout, &black);
-        gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (0, descent * 1.5f));
-
-        g_object_unref (layout);
+        if (TEXT_IS_LIST (list->data))
+            text_list_snapshot (TEXT_LIST (list->data), context, width, snapshot);
+        else if (TEXT_IS_BLOCK (list->data))
+            text_block_snapshot (TEXT_BLOCK (list->data), context, width, snapshot);
+        else
+            g_warning ("Skipping %s\n", g_type_name_from_instance ((GTypeInstance*)list->data));
 
     }
 

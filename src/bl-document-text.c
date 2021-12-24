@@ -1,6 +1,6 @@
 #include "bl-document-text.h"
 
-#include "text/text-block.h"
+#include "text/text.h"
 
 struct _BlDocumentText
 {
@@ -85,4 +85,12 @@ bl_document_text_init (BlDocumentText *self)
     self->blocks = NULL;
     self->blocks = g_list_append (self->blocks, text_block_new ("Once upon a time there was a dog called Rover."));
     self->blocks = g_list_append (self->blocks, text_block_new ("There was an Old Man with a beard / Who said, \"It is just as I feared! / Two Owls and a Hen, / Four Larks and a Wren, / Have all built their nests in my beard!\""));
+
+    TextList *node = text_list_new ();
+    text_node_append_child (TEXT_NODE (node), text_block_new ("List Item :)"));
+    text_node_append_child (TEXT_NODE (node), text_block_new ("Another one"));
+    text_node_append_child (TEXT_NODE (node), text_block_new ("Three! How fancy"));
+    self->blocks = g_list_append (self->blocks, node);
+
+    self->blocks = g_list_append (self->blocks, text_block_new ("Laborum dolor ut quaerat nostrum illum. Itaque ex ab officia. Odit harum corporis dolor ducimus et. Accusamus illum pariatur ut quisquam maxime assumenda. Voluptatum eius ratione saepe similique."));
 }

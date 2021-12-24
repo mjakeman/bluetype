@@ -2,12 +2,12 @@
 
 struct _TextBlock
 {
-    GObject parent_instance;
+    TextNode parent_instance;
 
     char *contents;
 };
 
-G_DEFINE_FINAL_TYPE (TextBlock, text_block, G_TYPE_OBJECT)
+G_DEFINE_FINAL_TYPE (TextBlock, text_block, TEXT_TYPE_NODE)
 
 enum {
     PROP_0,
