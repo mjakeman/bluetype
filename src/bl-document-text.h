@@ -1,4 +1,4 @@
-/* bl-application.h
+/* bl-document-text.h
  *
  * Copyright 2021 Matthew Jakeman <mjakeman26@outlook.co.nz>
  *
@@ -11,16 +11,15 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include <adwaita.h>
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
-#define BL_TYPE_APPLICATION (bl_application_get_type())
+#define BL_TYPE_DOCUMENT_TEXT (bl_document_text_get_type())
 
-G_DECLARE_FINAL_TYPE (BlApplication, bl_application, BL, APPLICATION, AdwApplication)
+G_DECLARE_FINAL_TYPE (BlDocumentText, bl_document_text, BL, DOCUMENT_TEXT, GObject)
 
-BlApplication *bl_application_new (gchar *application_id,
-                                               GApplicationFlags  flags);
+BlDocumentText *bl_document_text_new (void);
+GList *bl_document_text_get_blocks (BlDocumentText *self);
 
 G_END_DECLS

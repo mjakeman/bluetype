@@ -1,4 +1,4 @@
-/* bl-application.h
+/* text-block.h
  *
  * Copyright 2021 Matthew Jakeman <mjakeman26@outlook.co.nz>
  *
@@ -11,16 +11,16 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include <adwaita.h>
+#include <glib-object.h>
+
+#include "text-node.h"
 
 G_BEGIN_DECLS
 
-#define BL_TYPE_APPLICATION (bl_application_get_type())
+#define TEXT_TYPE_BLOCK (text_block_get_type())
 
-G_DECLARE_FINAL_TYPE (BlApplication, bl_application, BL, APPLICATION, AdwApplication)
+G_DECLARE_FINAL_TYPE (TextBlock, text_block, TEXT, BLOCK, TextNode)
 
-BlApplication *bl_application_new (gchar *application_id,
-                                               GApplicationFlags  flags);
+TextBlock *text_block_new (const char *initial_text);
 
 G_END_DECLS

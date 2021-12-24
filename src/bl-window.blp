@@ -3,7 +3,7 @@ using Adw 1;
 
 template BlWindow : Gtk.ApplicationWindow {
   default-width: 600;
-  default-height: 300;
+  default-height: 400;
 
   [titlebar]
   Gtk.HeaderBar header_bar {
@@ -73,7 +73,6 @@ template BlWindow : Gtk.ApplicationWindow {
 
       Gtk.ScrolledWindow {
         .BlDocumentView textview {
-          wrap-mode: word-char;
           vexpand: true;
         }
       }

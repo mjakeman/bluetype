@@ -1,22 +1,18 @@
 /* bl-application.c
  *
- * Copyright 2021 Matthew Jakeman
+ * Copyright 2021 Matthew Jakeman <mjakeman26@outlook.co.nz>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * SPDX-License-Identifier: MPL-2.0
  */
 
+#define G_LOG_DOMAIN "bluetype-application"
+
 #include "bl-application.h"
+
 #include "bl-window.h"
 
 struct _BlApplication
@@ -68,8 +64,6 @@ bl_application_activate (GApplication *app)
     if (window == NULL)
     window = g_object_new (BL_TYPE_WINDOW,
                            "application", app,
-                           "default-width", 600,
-                           "default-height", 300,
                            NULL);
 
     /* Ask the window manager/compositor to present the window. */
@@ -108,9 +102,14 @@ bl_application_show_about (GSimpleAction *action,
   window = gtk_application_get_active_window (GTK_APPLICATION (self));
 
   gtk_show_about_dialog (window,
-                         "program-name", "bluetype",
                          "authors", authors,
+                         "comments", "A fast and lightweight word processor.",
+                         "copyright", "Copyright © 2021 Matthew Jakeman",
+                         "license-type", GTK_LICENSE_LGPL_3_0,
+                         "logo-icon-name", "com.mattjakeman.Bluetype",
+                         "program-name", "bluetype",
                          "version", "0.1.0",
+                         "website", "https://github.com/mjakeman/bluetype-next",
                          NULL);
 }
 

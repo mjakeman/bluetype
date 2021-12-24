@@ -1,4 +1,4 @@
-/* bl-application.h
+/* text-list.h
  *
  * Copyright 2021 Matthew Jakeman <mjakeman26@outlook.co.nz>
  *
@@ -11,16 +11,16 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include <adwaita.h>
+#include <glib-object.h>
+
+#include "text-node.h"
 
 G_BEGIN_DECLS
 
-#define BL_TYPE_APPLICATION (bl_application_get_type())
+#define TEXT_TYPE_LIST (text_list_get_type())
 
-G_DECLARE_FINAL_TYPE (BlApplication, bl_application, BL, APPLICATION, AdwApplication)
+G_DECLARE_FINAL_TYPE (TextList, text_list, TEXT, LIST, TextNode)
 
-BlApplication *bl_application_new (gchar *application_id,
-                                               GApplicationFlags  flags);
+TextList *text_list_new (void);
 
 G_END_DECLS
