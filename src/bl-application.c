@@ -109,7 +109,7 @@ bl_application_show_about (GSimpleAction *action,
                          "logo-icon-name", "com.mattjakeman.Bluetype",
                          "program-name", "bluetype",
                          "version", "0.1.0",
-                         "website", "https://github.com/mjakeman/bluetype-next",
+                         "website", "https://github.com/mjakeman/bluetype",
                          NULL);
 }
 
