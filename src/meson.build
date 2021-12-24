@@ -22,7 +22,7 @@ blueprints = custom_target('blueprints',
     'bl-window.blp'
   ),
   output: '.',
-  command: [find_program('gtk-blueprint-tool'), 'batch-compile', '@OUTPUT@', '@INPUT@'],
+  command: [find_program('blueprint-compiler'), 'batch-compile', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@'],
 )
 
 # Create a static library so we can test it

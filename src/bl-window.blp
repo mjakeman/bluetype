@@ -15,7 +15,7 @@ template BlWindow : Gtk.ApplicationWindow {
     [end]
     Gtk.MenuButton {
       icon-name: "open-menu-symbolic";
-      menu-model: "primary_menu";
+      menu-model: primary_menu;
     }
   }
 
@@ -33,7 +33,7 @@ template BlWindow : Gtk.ApplicationWindow {
       }
       
       Gtk.ListView {
-        style "navigation-sidebar";
+        styles ["navigation-sidebar"]
       }
     }
 
@@ -45,13 +45,13 @@ template BlWindow : Gtk.ApplicationWindow {
       hexpand: true;
 
       Gtk.Box toolbar {
-        style "toolbar";
+        styles ["toolbar"]
         orientation: horizontal;
 
         Gtk.DropDown {}
 
         Gtk.Box {
-          style "linked";
+          styles ["linked"]
           orientation: horizontal;
 
           Gtk.ToggleButton btn_bold {
