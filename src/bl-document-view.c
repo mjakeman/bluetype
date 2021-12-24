@@ -34,6 +34,11 @@ struct _BlDocumentView
     BlDocumentText *doc;
     GtkIMContext *im_context;
 
+    GtkAdjustment *hadjustment;
+    GtkAdjustment *vadjustment;
+    GtkScrollablePolicy hscroll_policy;
+    GtkScrollablePolicy vscroll_policy;
+
     // TODO: Very temporary - replace with BlDocumentText
     GtkEntryBuffer *buffer;
 };
@@ -44,7 +49,13 @@ G_DEFINE_FINAL_TYPE_WITH_CODE (BlDocumentView, bl_document_view, GTK_TYPE_WIDGET
 enum {
     PROP_0,
     PROP_DOCUMENT,
-    N_PROPS
+    N_PROPS,
+
+    // Overridden Properties
+    PROP_HADJUSTMENT,
+    PROP_VADJUSTMENT,
+    PROP_HSCROLL_POLICY,
+    PROP_VSCROLL_POLICY
 };
 
 static GParamSpec *properties [N_PROPS];
@@ -79,6 +90,23 @@ bl_document_view_get_property (GObject    *object,
     case PROP_DOCUMENT:
         g_value_set_object (value, self->doc);
         break;
+
+    case PROP_HADJUSTMENT:
+        g_value_set_object (value, self->hadjustment);
+        break;
+
+    case PROP_VADJUSTMENT:
+        g_value_set_object (value, self->vadjustment);
+        break;
+
+    case PROP_HSCROLL_POLICY:
+        g_value_set_enum (value, self->hscroll_policy);
+        break;
+
+    case PROP_VSCROLL_POLICY:
+        g_value_set_enum (value, self->vscroll_policy);
+        break;
+
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -92,6 +120,8 @@ bl_document_view_set_property (GObject      *object,
 {
     BlDocumentView *self = BL_DOCUMENT_VIEW (object);
 
+    GtkAdjustment *adj;
+
     switch (prop_id)
     {
     case PROP_DOCUMENT:
@@ -103,16 +133,54 @@ bl_document_view_set_property (GObject      *object,
         if (self->doc == NULL)
             self->doc = bl_document_text_new ();
         break;
+
+    case PROP_HADJUSTMENT:
+        adj = g_value_get_object (value);
+        if (adj)
+        {
+            self->hadjustment = g_object_ref_sink (adj);
+        }
+        break;
+
+    case PROP_VADJUSTMENT:
+        adj = g_value_get_object (value);
+        if (adj)
+        {
+            self->vadjustment = g_object_ref_sink (adj);
+            gtk_adjustment_set_upper (self->vadjustment, 1);
+            gtk_adjustment_set_page_size (self->vadjustment, 0.5f);
+            gtk_adjustment_set_page_increment (self->vadjustment, 0.1f);
+            g_signal_connect_swapped (self->vadjustment, "value-changed", G_CALLBACK (gtk_widget_queue_draw), self);
+        }
+        break;
+
+    case PROP_HSCROLL_POLICY:
+        self->hscroll_policy = g_value_get_enum (value);
+        gtk_widget_queue_resize (GTK_WIDGET (self));
+        break;
+
+    case PROP_VSCROLL_POLICY:
+        self->vscroll_policy = g_value_get_enum (value);
+        gtk_widget_queue_resize (GTK_WIDGET (self));
+        break;
+
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
 
 static void
+bl_document_update_scroll_values (BlDocumentView *self)
+{
+
+}
+
+static void
 text_block_snapshot (TextBlock    *block,
                      PangoContext *context,
                      int           width,
-                     GtkSnapshot  *snapshot)
+                     GtkSnapshot  *snapshot,
+                     const gchar  *decoration)
 {
     char *text;
     g_object_get (block,
@@ -132,9 +200,23 @@ text_block_snapshot (TextBlock    *block,
     int index =  pango_layout_get_line_count (layout) - 1;
     PangoLayoutLine* last_line = pango_layout_get_line (layout, index);
 
-    int height, spacing;
-    pango_layout_line_get_height (last_line, &height);
-    spacing = (height / PANGO_SCALE) * 0.5f;
+    if (decoration)
+    {
+        int first_height;
+        PangoLayoutLine* first_line = pango_layout_get_line (layout, 0);
+        pango_layout_line_get_height (first_line, &first_height);
+
+        gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (-15, 0));
+        PangoLayout *decoration_layout = pango_layout_new (context);
+        pango_layout_set_text (decoration_layout, decoration, -1);
+        pango_layout_set_height (decoration_layout, first_height);
+        gtk_snapshot_append_layout (snapshot, decoration_layout, &black);
+        gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (15, 0));
+    }
+
+    int last_height, spacing;
+    pango_layout_line_get_height (last_line, &last_height);
+    spacing = (last_height / PANGO_SCALE) * 0.5f;
 
     int descent;
     pango_layout_get_pixel_size (layout, NULL, &descent);
@@ -151,17 +233,17 @@ text_list_snapshot (TextList     *list,
                     int           width,
                     GtkSnapshot  *snapshot)
 {
-    gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (50, 0));
+    gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (40, 0));
 
     TextNode *node;
     for (node = text_node_get_first_child (TEXT_NODE (list));
          node != NULL;
          node = text_node_get_next_sibling (node))
     {
-        text_block_snapshot (TEXT_BLOCK (node), context, width - 50, snapshot);
+        text_block_snapshot (TEXT_BLOCK (node), context, width - 40, snapshot, "•");
     }
 
-    gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (-50, 0));
+    gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (-40, 0));
 }
 
 static void
@@ -172,10 +254,14 @@ bl_document_view_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
     int padding = 20;
 
     int width = gtk_widget_get_allocated_width (widget);
+    int height = gtk_widget_get_allocated_height (widget);
     PangoContext *context = gtk_widget_get_pango_context (widget);
 
-    // Apply padding
-    gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (padding, padding));
+    int displacement = height * -gtk_adjustment_get_value (self->vadjustment);
+
+    // Apply padding and scroll displacement
+    // TODO: Use occlusion culling to remove text nodes not onscreen
+    gtk_snapshot_translate (snapshot, &GRAPHENE_POINT_INIT (padding, padding + displacement));
     width -= 2*padding;
 
     GList *list = bl_document_text_get_blocks (self->doc);
@@ -187,7 +273,7 @@ bl_document_view_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
         if (TEXT_IS_LIST (list->data))
             text_list_snapshot (TEXT_LIST (list->data), context, width, snapshot);
         else if (TEXT_IS_BLOCK (list->data))
-            text_block_snapshot (TEXT_BLOCK (list->data), context, width, snapshot);
+            text_block_snapshot (TEXT_BLOCK (list->data), context, width, snapshot, NULL);
         else
             g_warning ("Skipping %s\n", g_type_name_from_instance ((GTypeInstance*)list->data));
 
@@ -243,6 +329,11 @@ bl_document_view_class_init (BlDocumentViewClass *klass)
     object_class->finalize = bl_document_view_finalize;
     object_class->get_property = bl_document_view_get_property;
     object_class->set_property = bl_document_view_set_property;
+
+    g_object_class_override_property (object_class, PROP_HADJUSTMENT, "hadjustment");
+    g_object_class_override_property (object_class, PROP_VADJUSTMENT, "vadjustment");
+    g_object_class_override_property (object_class, PROP_HSCROLL_POLICY, "hscroll-policy");
+    g_object_class_override_property (object_class, PROP_VSCROLL_POLICY, "vscroll-policy");
 
     properties [PROP_DOCUMENT]
         = g_param_spec_object ("document",
@@ -341,6 +432,7 @@ bl_document_view_init (BlDocumentView *self)
     gtk_widget_set_can_focus (GTK_WIDGET (self), TRUE);
     gtk_widget_set_focus_on_click (GTK_WIDGET (self), TRUE);
     gtk_widget_set_cursor_from_name (GTK_WIDGET (self), "text");
+    gtk_widget_set_overflow (GTK_WIDGET (self), GTK_OVERFLOW_HIDDEN);
 
     // Setup Input Method
     self->im_context = gtk_im_multicontext_new ();

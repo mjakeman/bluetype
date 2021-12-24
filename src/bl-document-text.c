@@ -110,7 +110,7 @@ bl_document_text_init (BlDocumentText *self)
 
     TextList *node = text_list_new ();
     text_node_append_child (TEXT_NODE (node), text_block_new ("List Item :)"));
-    text_node_append_child (TEXT_NODE (node), text_block_new ("Another one"));
+    text_node_append_child (TEXT_NODE (node), text_block_new ("Another one. Laborum dolor ut quaerat nostrum illum. Itaque ex ab officia. Odit harum corporis dolor ducimus et. Accusamus illum pariatur ut quisquam maxime assumenda. Voluptatum eius ratione saepe similique."));
     text_node_append_child (TEXT_NODE (node), text_block_new ("Three! How fancy"));
     self->blocks = g_list_append (self->blocks, node);
 
