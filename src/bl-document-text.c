@@ -105,14 +105,35 @@ static void
 bl_document_text_init (BlDocumentText *self)
 {
     self->blocks = NULL;
-    self->blocks = g_list_append (self->blocks, text_block_new ("Once upon a time there was a dog called Rover."));
-    self->blocks = g_list_append (self->blocks, text_block_new ("There was an Old Man with a beard / Who said, \"It is just as I feared! / Two Owls and a Hen, / Four Larks and a Wren, / Have all built their nests in my beard!\""));
+    self->blocks = g_list_append (self->blocks, text_block_new ("A limerick (/ˈlɪmərɪk/ LIM-ər-ik) is a form of verse, usually humorous and frequently rude, in five-line, predominantly anapestic trimeter with a strict rhyme scheme of AABBA, in which the first, second and fifth line rhyme, while the third and fourth lines are shorter and share a different rhyme."));
+    self->blocks = g_list_append (self->blocks, text_block_new ("The following example is a limerick of unknown origin:"));
 
-    TextList *node = text_list_new ();
-    text_node_append_child (TEXT_NODE (node), text_block_new ("List Item :)"));
-    text_node_append_child (TEXT_NODE (node), text_block_new ("Another one. Laborum dolor ut quaerat nostrum illum. Itaque ex ab officia. Odit harum corporis dolor ducimus et. Accusamus illum pariatur ut quisquam maxime assumenda. Voluptatum eius ratione saepe similique."));
-    text_node_append_child (TEXT_NODE (node), text_block_new ("Three! How fancy"));
-    self->blocks = g_list_append (self->blocks, node);
+    TextList *list = text_list_new ();
+    text_node_append_child (TEXT_NODE (list), text_block_new ("The limerick packs laughs anatomical"));
+    text_node_append_child (TEXT_NODE (list), text_block_new ("Into space that is quite economical."));
+    text_node_append_child (TEXT_NODE (list), text_block_new ("  But the good ones I've seen"));
+    text_node_append_child (TEXT_NODE (list), text_block_new ("  So seldom are clean"));
+    text_node_append_child (TEXT_NODE (list), text_block_new ("And the clean ones so seldom are comical."));
+    self->blocks = g_list_append (self->blocks, list);
 
-    self->blocks = g_list_append (self->blocks, text_block_new ("Laborum dolor ut quaerat nostrum illum. Itaque ex ab officia. Odit harum corporis dolor ducimus et. Accusamus illum pariatur ut quisquam maxime assumenda. Voluptatum eius ratione saepe similique."));
+    self->blocks = g_list_append (self->blocks, text_block_new ("Source: Wikipedia [CC BY-SA 3.0]"));
+    self->blocks = g_list_append (self->blocks, text_block_new ("Here's one from somewhere on the internet:"));
+
+    list = text_list_new ();
+    text_node_append_child (TEXT_NODE (list), text_block_new ("There was an Old Man with a beard"));
+    text_node_append_child (TEXT_NODE (list), text_block_new ("Who said, \"It is just as I feared!"));
+    text_node_append_child (TEXT_NODE (list), text_block_new ("  Two Owls and a Hen,"));
+    text_node_append_child (TEXT_NODE (list), text_block_new ("  Four Larks and a Wren,"));
+    text_node_append_child (TEXT_NODE (list), text_block_new ("Have all built their nests in my beard!\""));
+    self->blocks = g_list_append (self->blocks, list);
+
+    self->blocks = g_list_append (self->blocks, text_block_new ("And an old classic:"));
+
+    list = text_list_new ();
+    text_node_append_child (TEXT_NODE (list), text_block_new ("There was an old man of Blackheath"));
+    text_node_append_child (TEXT_NODE (list), text_block_new ("Who sat on his set of false teeth."));
+    text_node_append_child (TEXT_NODE (list), text_block_new ("  Said he, with a start,"));
+    text_node_append_child (TEXT_NODE (list), text_block_new ("  \"Oh, bless my heart!"));
+    text_node_append_child (TEXT_NODE (list), text_block_new ("I've bitten myself underneath!\""));
+    self->blocks = g_list_append (self->blocks, list);
 }
