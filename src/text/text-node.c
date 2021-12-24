@@ -19,8 +19,8 @@ typedef struct
     TextNode *first_child;
     TextNode *last_child;
 
-    TextNode *prev_sibling;
-    TextNode *next_sibling;
+    TextNode *prev;
+    TextNode *next;
 
     TextNode *parent;
 
@@ -91,14 +91,14 @@ TextNode *
 text_node_get_next_sibling (TextNode *self)
 {
     TextNodePrivate *priv = text_node_get_instance_private (self);
-    return priv->next_sibling;
+    return priv->next;
 }
 
 TextNode *
 text_node_get_prev_sibling (TextNode *self)
 {
     TextNodePrivate *priv = text_node_get_instance_private (self);
-    return priv->prev_sibling;
+    return priv->prev;
 }
 
 TextNode *
@@ -138,8 +138,8 @@ text_node_append_child (TextNode *self, TextNode *child)
 
     TextNode *last_child = text_node_get_last_child (self);
     TextNodePrivate *last_child_priv = text_node_get_instance_private (last_child);
-    last_child_priv->next_sibling = child;
-    child_priv->prev_sibling = last_child;
+    last_child_priv->next = child;
+    child_priv->prev = last_child;
     child_priv->parent = self;
     priv->last_child = child;
 }
