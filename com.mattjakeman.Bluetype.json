@@ -29,7 +29,7 @@
             "buildsystem": "meson",
             "sources": [
                 {
-                    "type": "git",
+                    "type": "dir",
                     "path": "./"
                 }
             ]
