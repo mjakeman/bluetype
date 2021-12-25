@@ -13,6 +13,27 @@
 
 #include "text-node.h"
 
+/**
+ * TextNode:
+ *
+ * Base class for a node within the bluetype document model.
+ *
+ * The display process contains several steps:
+ *  - creation
+ *  - style cascade
+ *  - layout
+ *  - paint
+ *
+ * The idea is for each stage to be cached, so a change only performs the
+ * minimal updates necessary to redraw properly.
+ *
+ * For example, making a fragment of text bold will update the style cascade
+ * stage for any nodes within that fragment (fragments may span multiple nodes)
+ * and thus layout and paint will be invalidated. Each node may contain a
+ * 'dirty/clean' flag which is propagated upwards to the document root. Updates
+ * will only be performed on dirty child nodes.
+ */
+
 typedef struct
 {
     // Node Tree

@@ -1,4 +1,4 @@
-/* text.h
+/* text-table.h
  *
  * Copyright 2021 Matthew Jakeman <mjakeman26@outlook.co.nz>
  *
@@ -11,7 +11,16 @@
 
 #pragma once
 
+#include <glib-object.h>
+
 #include "text-node.h"
-#include "text-block.h"
-#include "text-list.h"
-#include "text-table.h"
+
+G_BEGIN_DECLS
+
+#define TEXT_TYPE_TABLE (text_table_get_type())
+
+G_DECLARE_FINAL_TYPE (TextTable, text_table, TEXT, TABLE, TextNode)
+
+TextTable *text_table_new (int rows, int cols);
+
+G_END_DECLS

@@ -237,6 +237,50 @@ text_list_snapshot (TextList     *list,
 }
 
 static void
+text_table_snapshot (TextTable    *table,
+                     PangoContext *context,
+                     int           width,
+                     GtkSnapshot  *snapshot,
+                     GdkRGBA      *color)
+{
+    g_info ("Hello World\n");
+
+    int rows, cols;
+    g_object_get (table, "rows", &rows, "cols", &cols, NULL);
+
+    int cell_height = 40;
+    int cell_width = width / rows;
+
+    GskRoundedRect rect;
+    gsk_rounded_rect_init_from_rect (&rect, &GRAPHENE_RECT_INIT(0, 0, width, cols*cell_height), 0);
+    gtk_snapshot_append_border (snapshot,
+                                &rect,
+                                (float[4]) { 1, 1, 1, 1 },
+                                (GdkRGBA[4]) { *color, *color, *color, *color });
+
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            GskRoundedRect rect;
+            gsk_rounded_rect_init_from_rect (&rect, &GRAPHENE_RECT_INIT(i*cell_width, j*cell_height, cell_width, cell_height), 0);
+            gtk_snapshot_append_border (snapshot,
+                                        &rect,
+                                        (float[4]) { 1, 1, 1, 1 },
+                                        (GdkRGBA[4]) { *color, *color, *color, *color });
+        }
+    }
+
+    TextNode *node;
+    for (node = text_node_get_first_child (TEXT_NODE (table));
+         node != NULL;
+         node = text_node_get_next_sibling (node))
+    {
+        // text_block_snapshot (TEXT_BLOCK (node), context, width - 40, snapshot, "•", text_color);
+    }
+}
+
+static void
 bl_document_view_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
 {
     BlDocumentView *self = BL_DOCUMENT_VIEW (widget);
@@ -267,6 +311,8 @@ bl_document_view_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
 
         if (TEXT_IS_LIST (list->data))
             text_list_snapshot (TEXT_LIST (list->data), context, width, snapshot, &text_color);
+        else if (TEXT_IS_TABLE (list->data))
+            text_table_snapshot (TEXT_TABLE (list->data), context, width, snapshot, &text_color);
         else if (TEXT_IS_BLOCK (list->data))
             text_block_snapshot (TEXT_BLOCK (list->data), context, width, snapshot, NULL, &text_color);
         else

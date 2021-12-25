@@ -7,7 +7,8 @@ bluetype_sources = [
     # Text Sources
     'text/text-node.c',
     'text/text-block.c',
-    'text/text-list.c'
+    'text/text-list.c',
+    'text/text-table.c'
 ]
 
 bluetype_deps = [

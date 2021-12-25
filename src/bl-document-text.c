@@ -127,4 +127,16 @@ bl_document_text_init (BlDocumentText *self)
     text_node_append_child (TEXT_NODE (list), text_block_new ("  \"Oh, bless my heart!"));
     text_node_append_child (TEXT_NODE (list), text_block_new ("I've bitten myself underneath!\""));
     self->blocks = g_list_append (self->blocks, list);
+
+    TextTable *table = text_table_new (3, 3);
+    text_node_append_child (TEXT_NODE (table), text_block_new ("A table is an arrangement of information or data, typically in rows and columns, or possibly in a more complex structure."));
+    text_node_append_child (TEXT_NODE (table), text_block_new ("Tables are widely used in communication, research, and data analysis."));
+    text_node_append_child (TEXT_NODE (table), text_block_new ("Tables appear in print media, handwritten notes, computer software, architectural ornamentation, traffic signs, and many other places."));
+    text_node_append_child (TEXT_NODE (table), text_block_new ("The precise conventions and terminology for describing tables vary depending on the context."));
+    text_node_append_child (TEXT_NODE (table), text_block_new ("Further, tables differ significantly in variety, structure, flexibility, notation, representation and use."));
+    text_node_append_child (TEXT_NODE (table), text_block_new ("Information or data conveyed in table form is said to be in tabular format (adjective)."));
+    text_node_append_child (TEXT_NODE (table), text_block_new ("In books and technical articles, tables are typically presented apart from the main text in numbered and captioned floating blocks."));
+    text_node_append_child (TEXT_NODE (table), text_block_new (NULL));
+    text_node_append_child (TEXT_NODE (table), text_block_new (NULL));
+    self->blocks = g_list_append (self->blocks, table);
 }
