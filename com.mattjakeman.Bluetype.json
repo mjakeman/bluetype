@@ -1,7 +1,7 @@
 {
     "app-id": "com.mattjakeman.Bluetype",
     "runtime": "org.gnome.Platform",
-    "runtime-version": "master",
+    "runtime-version": "42",
     "sdk": "org.gnome.Sdk",
     "command": "bluetype",
     "finish-args": [
