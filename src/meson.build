@@ -1,18 +1,12 @@
 bluetype_sources = [
     'bl-window.c',
-    'bl-application.c',
-    'bl-document-view.c',
-    'bl-document-text.c',
-
-    # Text Sources
-    'text/text-node.c',
-    'text/text-block.c',
-    'text/text-list.c'
+    'bl-application.c'
 ]
 
 bluetype_deps = [
     dependency('gtk4'),
-    dependency('libadwaita-1')
+    dependency('libadwaita-1'),
+    dependency('text-engine-0.1')
 ]
 
 gnome = import('gnome')

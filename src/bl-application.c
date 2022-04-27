@@ -24,6 +24,8 @@
 
 #include "bl-window.h"
 
+#include <text-engine/text-engine.h>
+
 struct _BlApplication
 {
   AdwApplication parent_instance;
@@ -59,6 +61,8 @@ bl_application_activate (GApplication *app)
     * by your users.
     */
     g_assert (GTK_IS_APPLICATION (app));
+
+    text_engine_init ();
 
     // Add CSS Stylesheet
     GtkCssProvider *css_provider = gtk_css_provider_new ();

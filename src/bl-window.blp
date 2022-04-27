@@ -9,7 +9,6 @@ template BlWindow : Gtk.ApplicationWindow {
   Gtk.HeaderBar header_bar {
     Gtk.ToggleButton flap_toggle {
       icon-name: "dock-left-symbolic";
-      // active: bind flap.reveal-flap sync-create;
     }
 
     [end]
@@ -20,8 +19,10 @@ template BlWindow : Gtk.ApplicationWindow {
   }
 
   Adw.Flap flap {
-    // todo: make bidirectional
-    reveal-flap: bind flap_toggle.active sync-create;
+    reveal-flap: bind flap_toggle.active bidirectional;
+    fold-policy: always;
+    transition-type: slide;
+    modal: false;
     
     [flap]
     Gtk.Box {
@@ -29,7 +30,7 @@ template BlWindow : Gtk.ApplicationWindow {
       
       Gtk.Label {
         label: "Project Tree";
-        width-chars: 15; // todo: temp
+        width-chars: 15;
       }
       
       Gtk.ListView {
@@ -72,8 +73,13 @@ template BlWindow : Gtk.ApplicationWindow {
       }
 
       Gtk.ScrolledWindow {
-        .BlDocumentView textview {
+        .TextDisplay textview {
           vexpand: true;
+
+          margin-start: 15;
+          margin-end: 15;
+          margin-top: 15;
+          margin-bottom: 15;
         }
       }
     }

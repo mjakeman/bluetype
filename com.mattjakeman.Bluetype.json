@@ -36,6 +36,17 @@
             ]
         },
         {
+            "name": "text-engine",
+            "builddir": true,
+            "buildsystem": "meson",
+            "sources": [
+                {
+                    "type": "dir",
+                    "path": "../document-engine"
+                }
+            ]
+        },
+        {
             "name": "bluetype",
             "builddir": true,
             "buildsystem": "meson",
