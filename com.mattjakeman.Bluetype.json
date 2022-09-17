@@ -1,7 +1,7 @@
 {
     "app-id": "com.mattjakeman.Bluetype",
     "runtime": "org.gnome.Platform",
-    "runtime-version": "master",
+    "runtime-version": "42",
     "sdk": "org.gnome.Sdk",
     "command": "bluetype",
     "finish-args": [
@@ -32,6 +32,18 @@
                     "type": "git",
                     "url": "https://gitlab.gnome.org/jwestman/blueprint-compiler.git",
                     "branch": "main"
+                }
+            ]
+        },
+        {
+            "name": "text-engine",
+            "builddir": true,
+            "buildsystem": "meson",
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/mjakeman/text-engine.git",
+                    "branch": "master"
                 }
             ]
         },
