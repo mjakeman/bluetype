@@ -41,8 +41,9 @@
             "buildsystem": "meson",
             "sources": [
                 {
-                    "type": "dir",
-                    "path": "../document-engine"
+                    "type": "git",
+                    "url": "https://github.com/mjakeman/text-engine.git",
+                    "branch": "master"
                 }
             ]
         },
